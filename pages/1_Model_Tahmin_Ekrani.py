@@ -45,16 +45,48 @@ def load_outages():
 
 @st.cache_resource
 def load_models():
-    if not os.path.exists(DURATION_MODEL_PATH):
-        return None, None
+    """
+    Model dosyalarını yükler.
+    Eğer Cloud ortamında pickle / sürüm uyumsuzluğu olursa modeli yeniden eğitir.
+    """
 
-    if not os.path.exists(HIGH_IMPACT_MODEL_PATH):
-        return None, None
+    try:
+        if not os.path.exists(DURATION_MODEL_PATH):
+            raise FileNotFoundError("duration_model.pkl bulunamadı.")
 
-    duration_model = joblib.load(DURATION_MODEL_PATH)
-    high_impact_model = joblib.load(HIGH_IMPACT_MODEL_PATH)
+        if not os.path.exists(HIGH_IMPACT_MODEL_PATH):
+            raise FileNotFoundError("high_impact_model.pkl bulunamadı.")
 
-    return duration_model, high_impact_model
+        duration_model = joblib.load(DURATION_MODEL_PATH)
+        high_impact_model = joblib.load(HIGH_IMPACT_MODEL_PATH)
+
+        return duration_model, high_impact_model, None
+
+    except Exception as error:
+        try:
+            st.warning(
+                "Model dosyaları mevcut ortamda okunamadı. "
+                "Cloud ortamında modeller yeniden eğitiliyor, bu işlem ilk açılışta biraz sürebilir."
+            )
+
+            import sys
+
+            SRC_DIR = os.path.join(BASE_DIR, "src")
+            if SRC_DIR not in sys.path:
+                sys.path.append(SRC_DIR)
+
+            from model import load_data, train_duration_model, train_high_impact_model
+
+            df = load_data()
+
+            duration_model, _ = train_duration_model(df)
+            high_impact_model, _ = train_high_impact_model(df)
+
+            return duration_model, high_impact_model, None
+
+        except Exception as retrain_error:
+            return None, None, str(retrain_error)
+            
 
 
 def get_options(df, column_name, default_list):
@@ -179,7 +211,7 @@ hesaplar.
 )
 
 outages_df = load_outages()
-duration_model, high_impact_model = load_models()
+duration_model, high_impact_model, model_error = load_models()
 
 if outages_df.empty:
     st.error("outages.csv bulunamadı. Önce aşağıdaki komutu çalıştırmalısın:")
@@ -187,8 +219,9 @@ if outages_df.empty:
     st.stop()
 
 if duration_model is None or high_impact_model is None:
-    st.error("Model dosyaları bulunamadı. Önce modeli eğitmelisin:")
-    st.code("python src/model.py", language="bash")
+    st.error("Model dosyaları yüklenemedi veya yeniden eğitilemedi.")
+    if model_error:
+        st.code(model_error)
     st.stop()
 
 
