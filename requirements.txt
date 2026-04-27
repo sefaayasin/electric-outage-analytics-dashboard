@@ -1,8 +1,8 @@
-pandas
-numpy
-scikit-learn
-streamlit
-plotly
-sqlalchemy
-openpyxl
-joblib
+streamlit==1.40.2
+pandas==2.2.3
+numpy==1.26.4
+scikit-learn==1.5.2
+plotly==5.24.1
+sqlalchemy==2.0.36
+openpyxl==3.1.5
+joblib==1.4.2
