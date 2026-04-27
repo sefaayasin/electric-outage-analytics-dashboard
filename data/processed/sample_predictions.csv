@@ -1,0 +1,6 @@
+﻿outage_id,city,district,network_element_type,outage_type,source,cause,affected_customer_count,energy_not_supplied_kwh,duration_min,high_impact,predicted_duration_min,predicted_high_impact,high_impact_probability
+11500,Konya,Akşehir,Fider,unplanned,CRM,Bakım çalışması,4105,438.2,5,1,107.96,1,0.969
+6476,Konya,Ereğli,Kablo,unplanned,Manual,Ağaç teması,629,1876.26,173,1,88.6,0,0.2414
+13168,Kayseri,Talas,Kablo,unplanned,Manual,Hava muhalefeti,702,1101.82,87,0,153.64,0,0.2556
+863,Kayseri,İncesu,Trafo,unplanned,Manual,Aşırı yüklenme,28,66.58,82,0,97.74,0,0.1286
+5971,Sivas,Merkez,Dağıtım Merkezi,unplanned,Manual,Bakım çalışması,5067,8491.47,62,1,95.08,1,0.9788

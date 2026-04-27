@@ -1,0 +1,2 @@
+﻿total_customer_count,total_outage_count,planned_outage_count,unplanned_outage_count,high_impact_count,force_majeure_count,total_ens_kwh,avg_duration_min,avg_affected_customer,saidi_min_per_customer,saifi_interruption_per_customer,caidi_min_per_interruption
+8141771,15000,5660,9340,10652,45,83230166.19,185.06,1661.43,555.9853,3.0609,181.6393
