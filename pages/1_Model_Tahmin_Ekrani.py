@@ -46,16 +46,16 @@ def load_outages():
 @st.cache_resource
 def load_models():
     """
-    Model dosyalarını yükler.
-    Eğer Cloud ortamında pickle / sürüm uyumsuzluğu olursa modeli yeniden eğitir.
+    Yayın ortamında hazır eğitilmiş model dosyalarını yükler.
+    Kullanıcı her girişinde model eğitimi yapılmaz.
     """
 
     try:
         if not os.path.exists(DURATION_MODEL_PATH):
-            raise FileNotFoundError("duration_model.pkl bulunamadı.")
+            return None, None, "duration_model.pkl bulunamadı."
 
         if not os.path.exists(HIGH_IMPACT_MODEL_PATH):
-            raise FileNotFoundError("high_impact_model.pkl bulunamadı.")
+            return None, None, "high_impact_model.pkl bulunamadı."
 
         duration_model = joblib.load(DURATION_MODEL_PATH)
         high_impact_model = joblib.load(HIGH_IMPACT_MODEL_PATH)
@@ -63,31 +63,8 @@ def load_models():
         return duration_model, high_impact_model, None
 
     except Exception as error:
-        try:
-            st.warning(
-                "Model dosyaları mevcut ortamda okunamadı. "
-                "Cloud ortamında modeller yeniden eğitiliyor, bu işlem ilk açılışta biraz sürebilir."
-            )
-
-            import sys
-
-            SRC_DIR = os.path.join(BASE_DIR, "src")
-            if SRC_DIR not in sys.path:
-                sys.path.append(SRC_DIR)
-
-            from model import load_data, train_duration_model, train_high_impact_model
-
-            df = load_data()
-
-            duration_model, _ = train_duration_model(df)
-            high_impact_model, _ = train_high_impact_model(df)
-
-            return duration_model, high_impact_model, None
-
-        except Exception as retrain_error:
-            return None, None, str(retrain_error)
+        return None, None, str(error)
             
-
 
 def get_options(df, column_name, default_list):
     if df.empty or column_name not in df.columns:
